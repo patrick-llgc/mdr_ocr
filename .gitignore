@@ -1,6 +1,8 @@
-testImages/
+testImages/*
+.ipynb_checkpoints/*
 .DS_Store
-.jpg
-.png
-.tif
-.zip
+*.jpg
+*.png
+*.tif
+*.zip
+

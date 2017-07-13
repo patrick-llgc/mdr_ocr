@@ -188,8 +188,12 @@ def find_bounding_box(image,
 
     # find the contours in the thresholded image, then sort the contours
     # by their area, keeping only the largest one
-    im2, cnts, hierarchy = cv2.findContours(delineated.copy().astype(np.uint8), 
-        cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if cv2.__version__[0] == '3':
+        im2, cnts, hierarchy = cv2.findContours(delineated.copy().astype(np.uint8), 
+            cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    else:
+        cnts, hierarchy = cv2.findContours(delineated.copy().astype(np.uint8), 
+            cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = [cnt for cnt in cnts if cv2.contourArea(cnt) > 1000]
 
     if save_image:
@@ -362,30 +366,30 @@ if save_image:
     cv2.imwrite('9.boxed_mainbody.jpg', canvas)
     cv2.imwrite('10.warped.jpg', warped)
 
-# crop and warp each line
-canvas, cnts = find_bounding_box(warped, 
-    morph_size=(20, 1), 
-    iterations=3, 
-    padding=1,
-    save_image=1,
-    open_size=(3, 3),
-    delineate=0)
+# # crop and warp each line
+# canvas, cnts = find_bounding_box(warped, 
+#     morph_size=(20, 1), 
+#     iterations=3, 
+#     padding=1,
+#     save_image=1,
+#     open_size=(3, 3),
+#     delineate=0)
 
-canvas_clean = canvas.copy()
-# compute and draw bounding box
-c = sorted(cnts, key=cv2.contourArea, reverse=True)
-for i in range(len(c)):
-    rect = cv2.minAreaRect(c[i])
-    box = np.int0(cv2.boxPoints(rect))
-    cv2.drawContours(canvas, [box], -1, 0, 3)
-    line = four_point_transform(canvas_clean, box)
-    # cv2.imshow('Line', pad(line, 5, 5))    
-    # cv2.waitKey(0)
-    # time.sleep(0.25) 
+# canvas_clean = canvas.copy()
+# # compute and draw bounding box
+# c = sorted(cnts, key=cv2.contourArea, reverse=True)
+# for i in range(len(c)):
+#     rect = cv2.minAreaRect(c[i])
+#     box = np.int0(cv2.boxPoints(rect))
+#     cv2.drawContours(canvas, [box], -1, 0, 3)
+#     line = four_point_transform(canvas_clean, box)
+#     # cv2.imshow('Line', pad(line, 5, 5))    
+#     # cv2.waitKey(0)
+#     # time.sleep(0.25) 
 
-h, w = canvas.shape
-cv2.imshow('Boxed Lines', cv2.resize(canvas, (w // 2, h // 2)))
-cv2.waitKey(0)
-if save_image:
-    cv2.imwrite('11.boxed_lines.jpg', canvas)
+# h, w = canvas.shape
+# cv2.imshow('Boxed Lines', cv2.resize(canvas, (w // 2, h // 2)))
+# cv2.waitKey(0)
+# if save_image:
+#     cv2.imwrite('11.boxed_lines.jpg', canvas)
 
